@@ -1,6 +1,15 @@
 <?php
+session_start();
 require_once('classes/database.php');
 $con = new database();
+
+// Handle author deletion
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete']) && isset($_POST['id'])) {
+    $con->deleteAuthor($_POST['id']);
+
+    header("Location: admin_homepage.php");
+    exit;
+}
 
 // Fetch authors from the database
 $authors = [];
@@ -133,29 +142,42 @@ try {
               </tr>
             </thead>
             <tbody>
-              <?php if (!empty($authors)): ?>
-                <?php foreach ($authors as $author): ?>
-                  <tr>
-                    <td><?= htmlspecialchars($author['author_id']) ?></td>
-                    <td><?= htmlspecialchars($author['author_firstname']) ?></td>
-                    <td><?= htmlspecialchars($author['author_lastname']) ?></td>
-                    <td><?= htmlspecialchars($author['author_birthdate']) ?></td>
-                    <td><?= htmlspecialchars($author['author_nationality']) ?></td>
-                    <td>
-                      <button type="button" class="btn btn-warning btn-sm">
+            <?php
+            $authors = $con->getAuthors();
+            if (!empty($authors)):
+              foreach ($authors as $author):
+            ?>
+              <tr>
+                <td><?= htmlspecialchars($author['author_id']) ?></td>
+                <td><?= htmlspecialchars($author['author_FN']) ?></td>
+                <td><?= htmlspecialchars($author['author_LN']) ?></td>
+                <td><?= htmlspecialchars($author['author_birthday']) ?></td>
+                <td><?= htmlspecialchars($author['author_nat']) ?></td>
+                <td>
+                  <div class="btn-group" role="group">
+                    <form action="update_authors.php" method="post" style="display:inline;">
+                      <input type="hidden" name="id" value="<?= htmlspecialchars($author['author_id']) ?>">
+                      <button type="submit" class="btn btn-warning btn-sm">
                         <i class="bi bi-pencil-square"></i>
                       </button>
-                      <button type="button" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this author?')">
+                    </form>
+                    <form method="POST" class="mx-1" style="display:inline;">
+                      <input type="hidden" name="id" value="<?= htmlspecialchars($author['author_id']) ?>">
+                      <button type="submit" name="delete" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this author?')">
                         <i class="bi bi-x-square"></i>
                       </button>
-                    </td>
-                  </tr>
-                <?php endforeach; ?>
-              <?php else: ?>
-                <tr>
-                  <td colspan="6">No authors found.</td>
-                </tr>
-              <?php endif; ?>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <?php
+              endforeach;
+            else:
+            ?>
+              <tr>
+                <td colspan="6">No authors found.</td>
+              </tr>
+            <?php endif; ?>
             </tbody>
           </table>
         </div>
@@ -180,42 +202,30 @@ try {
               </tr>
             </thead>
             <tbody>
+              <?php
+              // Fetch genres from the database
+              $genres = $con->getGenres(); // Assumes this method exists
+              if (!empty($genres)):
+                foreach ($genres as $genre):
+              ?>
               <tr>
-                <td>1</td>
-                <td>Fiction</td>
+                <td><?= htmlspecialchars($genre['genre_id']) ?></td>
+                <td><?= htmlspecialchars($genre['genre_name']) ?></td>
                 <td>
-                  <button type="submit" class="btn btn-warning btn-sm">
+                  <a href="update_genre.php?id=<?= htmlspecialchars($genre['genre_id']) ?>" class="btn btn-warning btn-sm">
                     <i class="bi bi-pencil-square"></i>
-                  </button>
-                  <button type="submit" name="delete" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this genre?')">
-                    <i class="bi bi-x-square"></i>
-                  </button>
+                  </a>
+                  <!-- You can add a delete button here if needed -->
                 </td>
               </tr>
+              <?php
+                endforeach;
+              else:
+              ?>
               <tr>
-                <td>2</td>
-                <td>Non-Fiction</td>
-                <td>
-                  <button type="submit" class="btn btn-warning btn-sm">
-                    <i class="bi bi-pencil-square"></i>
-                  </button>
-                  <button type="submit" name="delete" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this genre?')">
-                    <i class="bi bi-x-square"></i>
-                  </button>
-                </td>
+                <td colspan="3">No genres found.</td>
               </tr>
-              <tr>
-                <td>3</td>
-                <td>Science Fiction</td>
-                <td>
-                  <button type="submit" class="btn btn-warning btn-sm">
-                    <i class="bi bi-pencil-square"></i>
-                  </button>
-                  <button type="submit" name="delete" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this genre?')">
-                    <i class="bi bi-x-square"></i>
-                  </button>
-                </td>
-              </tr>
+              <?php endif; ?>
             </tbody>
           </table>
         </div>
