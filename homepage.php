@@ -1,9 +1,32 @@
+
+<?php
+session_start();
+require_once('classes/database.php');
+$con = new database();
+
+if (!isset($_SESSION['user_id'])) {
+    // Check the user type
+   
+   header('Location: index.php');
+
+    exit();
+
+} elseif ($_SESSION['user_type'] === 1) {
+        // Admin user, redirect to admin homepage
+        header('Location: admin_homepage.php');
+        exit();
+    }
+
+
+?>
+
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="./bootstrap-5.3.3-dist/css/bootstrap.css">
+  <link rel="stylesheet" href="./poppers/css/bootstrap-icons.css"> 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"> <!-- Correct Bootstrap Icons CSS -->
   <title>My Borrowed Books</title>
 </head>
@@ -80,11 +103,20 @@
   }
 
   function logout() {
+    
     alert('Logout clicked');
     // Add logic for logging out
   }
+  
+  <script src="poppers/js/popper.min.js"></script> <!-- Local Popper.js -->
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script> <!-- Add Popper.js -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script> <!-- Correct Bootstrap JS -->
+
+<script>
+function logout() {
+    window.location.href = 'logout.php';
+}
+</script>
 </body>
 </html>

@@ -1,44 +1,54 @@
 <?php
+
 session_start();
 require_once('classes/database.php');
+$sweetAlertConfig = "";
+
 $con = new database();
-$sweetAlertConfig = ""; 
-if (isset($_POST['login'])) {
+
+
+if(isset($_POST['login'])) {
+
+
+ 
   $email = $_POST['email'];
   $password = $_POST['password'];
- 
+
   $user = $con->loginUser($email, $password);
-  if($user){
+
+  if($user) {
     $_SESSION['user_id'] = $user['user_id'];
     $_SESSION['user_FN'] = $user['user_FN'];
     $_SESSION['user_type'] = $user['user_type'];
 
-    $redirectUrl = ($user['user_type'] == 1) ? 'admin_homepage.php' : 'homepage.php';
+
+     $redirectUrl = ($user['user_type'] == 1) ? 'admin_homepage.php' : 'homepage.php';
+
     $sweetAlertConfig = "<script>
         Swal.fire({
-          icon: 'success',
-          title: 'Login Successful',
-          text: 'Welcome, {$user['user_FN']}!',
-          confirmButtonText: 'Continue'
+        icon: 'success',
+        title: 'Login Successful',
+        text: 'Welcome, " . addslashes(htmlspecialchars($user['user_FN'])) . "!',
+        confirmButtonText: 'Continue'
         }).then(() => {
-          window.location.href = '$redirectUrl';
+        window.location.href = '$redirectUrl';
         });
-      </script>";
-  } else {
+    </script>";
+  }  else {
     $sweetAlertConfig = "<script>
-        Swal.fire({
-        icon: 'error',
-        title: 'Login Failed',
-        text: 'Invalid username or password.'
-        });
-        </script>";
+    Swal.fire({
+    icon: 'error',
+    title: 'Login Failed',
+    text: 'Invalid username or password.'
+    });
+</script>";
   }
+
 }
 
-
-
-
 ?>
+
+
 
 <!doctype html>
 <html lang="en">
@@ -48,9 +58,8 @@ if (isset($_POST['login'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="./bootstrap-5.3.3-dist/css/bootstrap.css">
+  <link rel="stylesheet" href="./package/dist/sweetalert2.css">
   <title>Library Management System</title>
-  <!-- Add this in your <head> or before </body> -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -71,16 +80,15 @@ if (isset($_POST['login'])) {
         <div class="valid-feedback">Looks good!</div>
         <div class="invalid-feedback">Please enter your password.</div>
       </div>
-      <button type="submit" name="login" class="btn btn-primary w-100 py-2">Login</button>
+      <button type="submit" name = "login" class="btn btn-primary w-100 py-2">Login</button>
       <div class="text-center mt-4">
-        <a href="admin_homepage.php" class="text-decoration-none">Access Admin Homepage (For now)</a><br>
         <a href="registration.php" class="text-decoration-none">Don't have an account? Register here</a>
       </div>
     </form>
-     <?php echo $sweetAlertConfig; ?>
+    <script src="./bootstrap-5.3.3-dist/js/bootstrap.js"></script>
+    <script src="./package/dist/sweetalert2.js"></script>
+    <?php echo $sweetAlertConfig; ?>
   </div>
-
-<script src="./bootstrap-5.3.3-dist/js/bootstrap.js"></script>
 
 
 </body>
